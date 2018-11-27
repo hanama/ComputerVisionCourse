@@ -34,8 +34,6 @@ nT = [Nx(:) Ny(:) Nz(:)];
 
 for i = 1:size(S_mat,1)
     S_vec = S_mat(i,:);
-    %%% [HM] - I removed " - coordinate" below %%%
-	%%% [AG] - vector s is pointing at the origin so (0,0,0) - S, "added minus to S_vec
     s = (repmat(-S_vec, size(coordinate,1), 1));
     % normalize vector s
     s = s./repmat(sqrt(sum(s.^2,2)), 1,3);
@@ -93,7 +91,6 @@ end
 [U,D,V] = svd(A);
 P = reshape(V(:,size(D,2)), [4 3])';
 Pnorm = P/norm(P); % constraint for optimization problem
-
 % section b
 pts2dEst = Pnorm*pts3d;
 pts2dEst = pts2dEst./repmat(pts2dEst(3,:), 3, 1); % normalize w curl
@@ -102,13 +99,14 @@ plot(pts2dEst(1,:),pts2dEst(2,:),'ro'); % plot projected poiints using matrix P
 for i = 1:size(pts2d,2)
     error(i) = norm(pts2d(:,i) - pts2dEst(:,i));
 end
-E = sum(error); % error units are pixels
+E = sum(error)/length(error); % error units are pixels
 
 % section c
 [K, R] = rq(Pnorm(1:3,1:3));
 scaling = K(3,3);
 K = K/scaling; % K(3,3) = 1
 R = scaling*R;
+
 % section f
 t = K\P(1:3,4);
 c = -inv(R)*t;
