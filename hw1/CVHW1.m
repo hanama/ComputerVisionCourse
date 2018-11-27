@@ -35,7 +35,8 @@ nT = [Nx(:) Ny(:) Nz(:)];
 for i = 1:size(S_mat,1)
     S_vec = S_mat(i,:);
     %%% [HM] - I removed " - coordinate" below %%%
-    s = (repmat(S_vec, size(coordinate,1), 1));
+	%%% [AG] - vector s is pointing at the origin so (0,0,0) - S, "added minus to S_vec
+    s = (repmat(-S_vec, size(coordinate,1), 1));
     % normalize vector s
     s = s./repmat(sqrt(sum(s.^2,2)), 1,3);
     % calculate irradiance
