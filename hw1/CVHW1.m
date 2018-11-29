@@ -117,26 +117,27 @@ plot3(c(1),c(2),c(3),'rx'); % plot camera location in 3D
 
 
 %% Q6
-trainingPath = 'leaf-data\training\';
-testPath = 'leaf-data\test\leaf6.png';
+trainingPath = [pwd '\leaf-data\training\'];
+testPath = [pwd '\leaf-data\test\leaf6.png'];
 testImg = imread(testPath);
-testImgGray = rgb2gray(testImg);
+testImgGray = rgb2gray(testImg); % convert target image to gray
 sizeVec = size(testImgGray);
+% convert training images to gray
 for i=1:5
     trainingSet{i} = imread([trainingPath 'leaf' num2str(i) '.png']);
     trainingSetGray{i} = rgb2gray(trainingSet{i});
     sizeVec(i+1,:) = size(trainingSetGray{i});
 end
-resize = [max(sizeVec(:,1)), max(sizeVec(:,2)) ];
+resize = [max(sizeVec(:,1)), max(sizeVec(:,2)) ]; % maximal width and height
 Threshold = 200/255;
 % imshow(testImgGray);
 testBinary = im2bw(testImgGray, Threshold);
 testBinary = ~testBinary;
+% padd image with zeros
 [testSize(1), testSize(2)] = size(testBinary);
 testBinary = [zeros(testSize(1),floor((resize(2)-testSize(2))/2)) ,testBinary , zeros(testSize(1),ceil((resize(2)-testSize(2))/2))];
 [testSize(1), testSize(2)] = size(testBinary);
 testBinary = [zeros(floor((resize(1)-testSize(1))/2),testSize(2)); testBinary; zeros(ceil((resize(1)-testSize(1))/2),testSize(2))];
-%imshow(I2);
 
 testBinaryMorph = imclose(testBinary, strel('disk', 30));
 scale = sum(sum(testBinaryMorph));
@@ -153,12 +154,14 @@ for i=1:5
     trainingSetBinary{i} = [zeros(floor((resize(1)-rowSize)/2),colSize); trainingSetBinary{i}; zeros(ceil((resize(1)-rowSize)/2),colSize)];
 
     diff = testBinaryMorph - trainingSetBinary{i};
-    figure(i*10);
-    imshow(diff);
-    blank = (diff == 0); % need to change
+%     figure(i*10);
+%     imshow(diff);
+
+% scoring alogirithm, found number of white, grey, black pixels
+    blank = (diff == 0); 
     score1 = sum(sum(blank.*testBinaryMorph));
     score0 = sum(sum(diff == 1)); 
-    scoreMinus = sum(sum(diff == -1)); % need to change 
+    scoreMinus = sum(sum(diff == -1)); 
     score(i) = (score1-scoreMinus-score0)/scale;
     if score(i) < 0
         score(i) = 0;
