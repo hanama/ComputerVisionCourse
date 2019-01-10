@@ -1,4 +1,7 @@
-% Aram Gasparian, 310410865, aram89@campus.technion.ac.i
+% HW3 - Task2
+%Hana Matatov, 203608302, shanama@campus.technion.ac.il
+%Aram Gasparian, 310410865, aram89@campus.technion.ac.i
+clc, close all;
 %------------------------------------------------------------
 addpath('sift', 'Stop Images');
 %% Q1 - SIFT
