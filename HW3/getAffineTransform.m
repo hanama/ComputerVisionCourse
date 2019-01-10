@@ -1,4 +1,4 @@
-% section 3
+% section 3 q1
 function H = getAffineTransform(p1, p2)
 % P*h=PCurl
 % Create P matrix

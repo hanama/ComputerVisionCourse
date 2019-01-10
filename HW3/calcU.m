@@ -1,3 +1,4 @@
+% For question 2
 function [u, patchIdx] = calcU(h, w, N, T, Ix, Iy, It, frameIdx)
 u = [];
 patchIdx = [];

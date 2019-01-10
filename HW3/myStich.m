@@ -1,3 +1,4 @@
+% section 6 q1 - image stitching
 function Istiched = myStich(I1, I2)
 I1(ismissing(I1)) = 0; % take care of NaN
 

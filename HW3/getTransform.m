@@ -1,4 +1,4 @@
-% section 4 - Find al inliers
+% section 4 q1- Find al inliers
 function [bestH, maxInliers, ransacMatch] = getTransform(P1, P2, match)
 iterations = 1000;
 bestH = [];

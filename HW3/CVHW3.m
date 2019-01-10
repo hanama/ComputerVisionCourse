@@ -1,24 +1,24 @@
-% HW3 - Task2
+% HW3
 %Hana Matatov, 203608302, shanama@campus.technion.ac.il
 %Aram Gasparian, 310410865, aram89@campus.technion.ac.i
 clc, close all;
 %------------------------------------------------------------
 addpath('sift', 'Stop Images');
-%% Q1 - SIFT
+%% Q1 - Image Stitching
 % read images 
 files = dir('Stop Images\*.jpg');
 imageList = {files(:).name};
 I = cell(4);
 descr = cell(4);
 frames = cell(4);
-% section 1 - extract sift descriptor
+%% section 1 - extract sift descriptor
 for i = 1:numel(imageList)
    imageName = imageList{i};
    I{i} = im2double(imread(imageName));
    [frames{i}, descr{i}] = sift(rgb2gray(I{i}));
 end
 
-% section 2 - find matching key-points
+%% section 2 - find matching key-points
 match12 = siftmatch(descr{1}, descr{2});
 match13 = siftmatch(descr{1}, descr{3});
 match14 = siftmatch(descr{1}, descr{4});
@@ -26,7 +26,7 @@ match14 = siftmatch(descr{1}, descr{4});
 figure, plotmatches(I{1},I{2}, frames{1}, frames{2}, match12);
 figure, plotmatches(I{1},I{3}, frames{1}, frames{3}, match13);
 figure, plotmatches(I{1},I{4}, frames{1}, frames{4}, match14);
-%%
+%% section 3 and 4 - calculate affine tranformation
 [H12, inliers12, ransacMatch12] = getTransform(frames{1}, frames{2}, match12);
 figure, plotmatches(I{1},I{2}, frames{1}, frames{2}, ransacMatch12);
 
@@ -46,7 +46,7 @@ disp(['Inliers14 = ' num2str(inliers14)]);
 disp(H14);
 disp('---------------------------------------');
 
-%%
+%% section 5 - image warping, and section 6 - image stitching
 warpI12 = myWarp(I{1}, H12);
 figure, imshow(warpI12);
 stiched12 = myStich(warpI12, I{2});
@@ -67,9 +67,9 @@ figure, imshow(stiched14);
 %% Q2 - Optical flow
 N = 16;
 T = 1;
-% frameIdx = 1;
 seq = im2double(imread('seq.gif'));
 [h, w, ch, t] = size(seq);
+%% section 1 - finding [y,v]
 % show all frames as one image
 seq = squeeze(seq);
 seq2 = reshape(seq,h,[]);
@@ -87,26 +87,27 @@ Iy = reshape(patches, N*N, h*w/N^2, t);
 patches = im2col(seqDt, [N N], 'distinct');
 It = reshape(patches, N*N, h*w/N^2, t);
 
-frameNum = 10;
+%% section 2 - plot results
+the_frames = [ 1 10 20 30 40 49 ]';
+the_frames_seq = [ 1 2 3 4 5 6 ]';
 Frames = [];
 iptsetpref('ImshowBorder','tight');
-for frameIdx = 1:frameNum
+for frameIdx = 1: size(the_frames, 1)
+    wanted_frame = the_frames(frameIdx);
     % iterate over regions in one frame
-    [u, patchIdx] = calcU(h, w, N, T, Ix, Iy, It, frameIdx);
-    h1 = figure('visible','off'); imshow(seq(:,:,frameIdx));
+    [u, patchIdx] = calcU(h, w, N, T, Ix, Iy, It, wanted_frame);
+    h1 = figure('visible','off'); imshow(seq(:,:,wanted_frame));
     hold all;
     % calculate top left pixel coordinates of patches
     y = (floor((patchIdx-1)./(h/N))').*N+1;
     x = mod((patchIdx-1)', h/N).*N+1;
     quiver(y,x,u(1,:)',u(2,:)', 'Color', 'red');
-%     title(['N = ' num2str(N) ', T = ' num2str(T)]);
     hold off;
     currFrame = getframe(h1);
     Frames = [Frames currFrame.cdata];
 end
 figure, imshow(Frames);
-%%
-% section 3 - T = 0.1
+%% section 3: T = 0.1
 T = 0.1;
 % iterate over regions in one frame
 [u, patchIdx] = calcU(h, w, N, T, Ix, Iy, It, frameIdx);
@@ -119,7 +120,7 @@ quiver(y,x,u(1,:)',u(2,:)', 'Color', 'red');
 title(['N = ' num2str(N) ', T = ' num2str(T)]);
 hold off;
 
-% section 4 - N = 8, T = [1, 0.1]
+%% section 4: N = 8, T = [1, 0.1]
 N = 8;
 patches = im2col(seqDx, [N N], 'distinct');
 Ix = reshape(patches, N*N, h*w/N^2, t);
@@ -142,5 +143,3 @@ for T = Tvec
     quiver(y,x,u(1,:)',u(2,:)', 'Color', 'red');
     title(['N = ' num2str(N) ', T = ' num2str(T)]);
 end
-
-%%

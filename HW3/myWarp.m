@@ -1,4 +1,4 @@
-% section 5 - Image warping
+% section 5 q1 - Image warping
 % I - input image
 % H - affine transform
 function Ip = myWarp(I, H)
